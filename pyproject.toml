@@ -1,0 +1,21 @@
+[project]
+name = "escrowproj"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.20.0",
+    "apscheduler>=3.11.3",
+    "bcrypt==4.0.1",
+    "fastapi[standard]>=0.141.1",
+    "google-cloud-firestore>=2.31.0",
+    "httpx>=0.28.1",
+    "passlib[bcrypt]>=1.7.4",
+    "psycopg[binary]>=3.3.5",
+    "pyjwt>=2.14.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "redis>=8.1.0",
+    "slowapi>=0.1.10",
+    "sqlalchemy>=2.0.54",
+    "sqlmodel>=0.0.42",
+]
