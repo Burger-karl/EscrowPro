@@ -72,7 +72,6 @@ EscrowProj/
 ├── Dockerfile                 # container build (uses uv)
 ├── docker-compose.yaml           # api + postgres + redis services
 ├── .env                       # local secrets — NEVER commit (see .gitignore)
-├── .env.example                # template showing which vars are needed
 └── app/
     ├── main.py                 # FastAPI app: router includes, middleware, lifespan
     ├── seed.py                    # optional: seed dev data
