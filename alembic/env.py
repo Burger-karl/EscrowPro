@@ -11,6 +11,7 @@ from alembic import context
 # Add each new domain's `models` import here as it's built.
 from app.core.config import settings
 from app.src.accounts import models as accounts_models  # noqa: F401
+from app.src.contracts import models as contracts_models  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

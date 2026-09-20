@@ -16,7 +16,10 @@ from app.core.config import settings
 from app.core.errors import register_exception_handlers
 from app.core.middleware import RequestContextMiddleware
 from app.core.rate_limit import limiter
+
 from app.src.accounts.router import router as accounts_router
+from app.src.contracts.router import router as contracts_router
+
 
 logging.basicConfig(level=settings.LOG_LEVEL)
 
@@ -51,7 +54,7 @@ def create_app() -> FastAPI:
 
     # --- Routers ---
     app.include_router(accounts_router, prefix=API_PREFIX)
-    # app.include_router(contracts_router, prefix=API_PREFIX)
+    app.include_router(contracts_router, prefix=API_PREFIX)
     # app.include_router(escrow_router, prefix=API_PREFIX)
     # app.include_router(disputes_router, prefix=API_PREFIX)
     # app.include_router(payouts_router, prefix=API_PREFIX)
