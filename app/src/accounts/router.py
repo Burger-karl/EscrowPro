@@ -6,7 +6,7 @@ from app.core.rate_limit import limiter
 from app.src.accounts import services
 from app.src.accounts.schemas import LoginIn, RefreshIn, RegisterIn, TokenOut
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 @router.post("/register", response_model=TokenOut, status_code=status.HTTP_201_CREATED)

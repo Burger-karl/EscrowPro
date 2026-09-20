@@ -6,7 +6,7 @@ from app.core.dependencies import CurrentUser, DbSession
 from app.src.contracts import services
 from app.src.contracts.schemas import ContractCreateIn, ContractOut, MilestoneOut
 
-router = APIRouter(tags=["contracts"])
+router = APIRouter(tags=["Contracts"])
 
 
 @router.post("/contracts", response_model=ContractOut, status_code=status.HTTP_201_CREATED)
