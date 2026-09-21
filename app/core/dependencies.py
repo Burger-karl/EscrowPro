@@ -3,7 +3,7 @@ from collections.abc import Callable
 from typing import Annotated
 
 from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlmodel import Session
 
 from app.core.errors import ForbiddenError, UnauthorizedError
@@ -13,7 +13,7 @@ from app.src.accounts import utils
 from app.src.accounts.models import User, UserRole
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=True)
+bearer_scheme = HTTPBearer()
 
 # DB
 def get_db() -> Session:
@@ -25,8 +25,9 @@ DbSession = Annotated[Session, Depends(get_db)]
 # Auth
 def get_current_user(
     session: DbSession, 
-    token: Annotated[str, Depends(oauth2_scheme)],
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)],
 ) -> User:
+    token = credentials.credentials
     try:
         payload = decode_token(token, expected_type=TokenType.ACCESS)
     except TokenPayloadError as exc:
