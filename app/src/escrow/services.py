@@ -98,6 +98,48 @@ def release_milestone(session: Session, milestone: Milestone) -> None:
     )
 
 
+def split_milestone(
+        session: Session,
+        milestone: Milestone,
+        freelancer_percent: int
+) -> tuple[int, int]:
+    """Arbiter's ruling: escrow -total, freelancer +freelancer_amount, client +client_amount. Returns (freelancer_amount, client_amount)"""
+    total = milestone.amount_minor
+    freelancer_amount = total * freelancer_percent // 100
+    client_amount = total - freelancer_amount
+
+    escrow_balance = utils.get_balance(session, milestone.contract_id, LedgerAccount.ESCROW)
+    if escrow_balance < total:
+        raise ConflictError(
+            "escrow does not hold enough funds to settle this dispute",
+            code="insufficient_escrow_balance",
+        )
+    
+    entries = [
+        LedgerEntry(
+            contract_id=milestone.contract_id, account=LedgerAccount.ESCROW, amount=-Decimal(total)
+        )
+    ]
+    if freelancer_amount > 0:
+        entries.append(
+            LedgerEntry(
+                contract_id=milestone.contract_id,
+                account=LedgerAccount.FREELANCER,
+                amount=Decimal(freelancer_amount),
+            )
+        )
+    if client_amount > 0:
+        entries.append(
+            LedgerEntry(
+                contract_id=milestone.contract_id,
+                account=LedgerAccount.CLIENT,
+                amount=Decimal(client_amount),
+            )
+        )
+    utils.add_ledger_entries(session, entries)
+    return freelancer_amount, client_amount
+
+
 def record_payout(session: Session, contract_id: uuid.UUID, amount_minor: int) -> None:
     amount = Decimal(amount_minor)
     balance = utilis.get_balance(session, contract_id, LedgerAccount.FREELANCER)
