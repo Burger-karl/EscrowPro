@@ -98,6 +98,27 @@ def release_milestone(session: Session, milestone: Milestone) -> None:
     )
 
 
+def record_payout(session: Session, contract_id: uuid.UUID, amount_minor: int) -> None:
+    amount = Decimal(amount_minor)
+    balance = utilis.get_balance(session, contract_id, LedgerAccount.FREELANCER)
+    if balance < amount:
+        raise ConflictError(
+            "freelancer balance is too low for this payout",
+            code="insufficient_balance",
+        )
+
+    utils.add_ledger_entries(
+        session,
+        [
+            LedgerEntry(contract_id=contract_id,
+            account=LedgerAccount.FREELANCER,
+            amount=-amount),
+            LedgerEntry(contract_id=contract_id,
+            account=LedgerAccount.PAYOUT, ammount=amount),
+        ],
+    )
+
+
 def get_statement(session: Session, user: User, contract_id: uuid.UUID) -> StatementOut:
     contract = contracts_utils.get_contract_by_id(session, contract_id)
     if contract is None:
@@ -115,5 +136,6 @@ def get_statement(session: Session, user: User, contract_id: uuid.UUID) -> State
         client_balance=utils.get_balance(session, contract_id, LedgerAccount.CLIENT),
         escrow_balance=utils.get_balance(session, contract_id, LedgerAccount.ESCROW),
         freelancer_balance=utils.get_balance(session, contract_id, LedgerAccount.FREELANCER),
+        payout_balance=utils.get_balance(session, contract_id, LedgerAccount.PAYOUT),
         entries=[LedgerEntryOut.model_validate(e) for e in entries],
     )
