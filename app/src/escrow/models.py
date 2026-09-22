@@ -11,6 +11,7 @@ class LedgerAccount(StrEnum):
     CLIENT = "client"
     ESCROW = "escrow"
     FREELANCER = "freelancer"
+    PAYOUT = "payout"
 
 class LedgerEntry(IDMixin, TimestampMixin, table=True):
     __tablename__ = "ledger_entries"

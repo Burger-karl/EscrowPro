@@ -13,6 +13,7 @@ from app.core.rate_limit import limiter
 from app.src.accounts.router import router as accounts_router
 from app.src.contracts.router import router as contracts_router
 from app.src.escrow.router import router as escrow_router
+from app.src.payouts.router import router as payouts_router
 
 
 logging.basicConfig(level=settings.LOG_LEVEL)
@@ -51,7 +52,7 @@ def create_app() -> FastAPI:
     app.include_router(contracts_router, prefix=API_PREFIX)
     app.include_router(escrow_router, prefix=API_PREFIX)
     # app.include_router(disputes_router, prefix=API_PREFIX)
-    # app.include_router(payouts_router, prefix=API_PREFIX)
+    app.include_router(payouts_router, prefix=API_PREFIX)
     # app.include_router(payments_router, prefix=API_PREFIX)
 
     @app.get("/health", tags=["meta"])
