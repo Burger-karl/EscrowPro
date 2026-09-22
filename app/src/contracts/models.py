@@ -9,6 +9,7 @@ from app.db.base import IDMixin, TimestampMixin, UpdatedAtMixin
 class ContractStatus(StrEnum):
     DRAFT = "draft"           # created, not yet funded
     ACTIVE = "active"          # funded, milestones in progress
+    DISPUTED = "disputed"        # client/freelancer disagree on milestone completion
     COMPLETED = "completed"     # all milestones approved and paid out
     CANCELLED = "cancelled"      # terminated before completion
 
@@ -18,6 +19,8 @@ class MilestoneStatus(StrEnum):
     SUBMITTED = "submitted"      # freelancer says work is done, awaiting client
     APPROVED = "approved"         # client approved — triggers escrow release
     REJECTED = "rejected"          # client rejected — sent back to freelancer
+    DISPUTED = "disputed"          # client/freelancer disagree on completion
+    RESOLVED = "resolved"          # dispute resolved, milestone completed
 
 
 class Contract(IDMixin, TimestampMixin, UpdatedAtMixin, table=True):

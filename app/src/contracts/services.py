@@ -105,6 +105,7 @@ def approve_milestone(session: Session, client: User, milestone_id: uuid.UUID) -
 
 def complete_contract_if_all_milestones_approved(session: Session, contract: Contract) -> None:
     all_milestones = utils.list_milestones_for_contract(session, contract.id)
-    if all(m.status == MilestoneStatus.APPROVED for m in all_milestones):
+    settled = (MilestoneStatus.APPROVED, MilestoneStatus.RESOLVED)
+    if all(m.status in settled for m in all_milestones):
         contract.status = ContractStatus.COMPLETED
         session.add(contract)
