@@ -15,6 +15,7 @@ from app.src.contracts import models as contracts_models  # noqa: F401
 from app.src.escrow import models as escrow_models  # noqa: F401
 from app.src.payouts import models as payouts_models  # noqa: F401
 
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

@@ -26,7 +26,6 @@ class StatementOut(BaseModel):
     contract_id: uuid.UUID
     client_balance: Decimal
     escrow_balance: Decimal
-    freelancer_balance: Decimal
     entries: list[LedgerEntryOut]
     freelancer_balance: Decimal
     payout_balance: Decimal

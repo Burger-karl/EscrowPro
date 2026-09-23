@@ -100,7 +100,7 @@ def release_milestone(session: Session, milestone: Milestone) -> None:
 
 def record_payout(session: Session, contract_id: uuid.UUID, amount_minor: int) -> None:
     amount = Decimal(amount_minor)
-    balance = utilis.get_balance(session, contract_id, LedgerAccount.FREELANCER)
+    balance = utils.get_balance(session, contract_id, LedgerAccount.FREELANCER)
     if balance < amount:
         raise ConflictError(
             "freelancer balance is too low for this payout",
@@ -114,7 +114,7 @@ def record_payout(session: Session, contract_id: uuid.UUID, amount_minor: int) -
             account=LedgerAccount.FREELANCER,
             amount=-amount),
             LedgerEntry(contract_id=contract_id,
-            account=LedgerAccount.PAYOUT, ammount=amount),
+            account=LedgerAccount.PAYOUT, amount=amount),
         ],
     )
 
