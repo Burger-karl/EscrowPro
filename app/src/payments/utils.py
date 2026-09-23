@@ -23,3 +23,7 @@ def mark_transaction_status(
 
 def get_processed_event(session: Session, event_id: str) -> ProcessedEvent | None:
     return session.get(ProcessedEvent, event_id)
+
+
+def save_processed_event(session: Session, event_id: str, reference: str) -> None:
+    session.add(ProcessedEvent(event_id=event_id, reference=reference))

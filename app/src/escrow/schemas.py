@@ -17,10 +17,6 @@ class LedgerEntryOut(BaseModel):
 
     model_config = {"from_attributes": True}
 
-class FundContractOut(BaseModel):
-    contract_id: uuid.UUID
-    status: ContractStatus
-    funded_amount: Decimal
 
 class StatementOut(BaseModel):
     contract_id: uuid.UUID
