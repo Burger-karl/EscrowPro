@@ -7,7 +7,8 @@ from app.src.disputes.models import DisputeStatus
 
 
 class DisputeOpenIn(BaseModel):
-    milestone_id: uuid.UUID
+    contract_id: uuid.UUID
+    milestone_id: uuid.UUID | None = None
 
 
 class DisputeResolveIn(BaseModel):
@@ -18,7 +19,7 @@ class DisputeResolveIn(BaseModel):
 class MessageIn(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    body: str
+    body: str = Field(min_length=1, max_length=2000)
 
 
 class MessageOut(BaseModel):
@@ -32,7 +33,8 @@ class MessageOut(BaseModel):
 
 class DisputeOut(BaseModel):
     id: uuid.UUID
-    milestone_id: uuid.UUID
+    contract_id: uuid.UUID
+    milestone_id: uuid.UUID | None
     opened_by: uuid.UUID
     status: DisputeStatus
     resolution_json: dict | None
