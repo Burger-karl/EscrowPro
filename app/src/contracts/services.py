@@ -7,6 +7,7 @@ from app.src.accounts.models import User, UserRole
 from app.src.contracts import utils
 from app.src.contracts.models import Contract, ContractStatus, Milestone, MilestoneStatus
 from app.src.contracts.schemas import ContractCreateIn
+from app.src.escrow import utils as escrow_utils
 from app.src.escrow.services import release_milestone as escrow_release_milestone
 
 
@@ -47,16 +48,42 @@ def get_contract(session: Session, user: User, contract_id: uuid.UUID) -> Contra
     return contract
 
 
-def submit_milestone(session: Session, freelancer: User, milestone_id: uuid.UUID) -> Milestone:
+def get_milestone(session: Session, user: User, milestone_id: uuid.UUID) -> Milestone:
+    """Fetches one milestone (its description, amount, status) for a party or the arbiter — e.g. so an arbiter can see what a disputed milestone is actually about before resolving it."""
     milestone = utils.get_milestone_by_id(session, milestone_id)
     if milestone is None:
         raise NotFoundError("milestone not found", code="milestone_not_found")
 
     contract = utils.get_contract_by_id(session, milestone.contract_id)
+    if contract is None:
+        raise NotFoundError("milestone not found", code="milestone_not_found")
+
+    require_party_or_arbiter(contract, user)
+    return milestone
+
+
+
+def submit_milestone(session: Session, freelancer: User, milestone_id: uuid.UUID) -> Milestone:
+    milestone = utils.get_milestone_by_id(session, milestone_id)
+    if milestone is None:
+        raise NotFoundError("milestone not found", code="milestone_not_found")
+
+    # Lock the contract so this can't land in the middle of a dispute being opened on it (which also needs the same lock before it changes status).
+    # This is a bit of a hack, but it's the only way to do it without a transaction.
+
+    contract = escrow_utils.get_contract_for_update(session, milestone.contract_id)
+    session.refresh(milestone)
+
     if contract is None or contract.freelancer_id != freelancer.id:
         raise ForbiddenError(
             "only the assigned freelancer can submit this milestone",
             code="not_assigned_freelancer",
+        )
+
+    if contract.status != ContractStatus.ACTIVE:
+        raise ConflictError(
+            f"the contract is not active (status '{contract.status.value}')",
+            code="contract_not_active",
         )
 
     if milestone.status not in (MilestoneStatus.PENDING, MilestoneStatus.REJECTED):
@@ -66,7 +93,11 @@ def submit_milestone(session: Session, freelancer: User, milestone_id: uuid.UUID
         )
 
     milestone.status = MilestoneStatus.SUBMITTED
-    return utils.save_milestone(session, milestone)
+    session.add(milestone)
+    session.commit()
+    session.refresh(milestone)
+    return milestone
+
 
 
 def approve_milestone(session: Session, client: User, milestone_id: uuid.UUID) -> Milestone:
@@ -74,11 +105,19 @@ def approve_milestone(session: Session, client: User, milestone_id: uuid.UUID) -
     if milestone is None:
         raise NotFoundError("milestone not found", code="milestone_not_found")
 
-    contract = utils.get_contract_by_id(session, milestone.contract_id)
+    contract = escrow_utils.get_contract_for_update(session, milestone.contract_id)
+    session.refresh(milestone)
+
     if contract is None or contract.client_id != client.id:
         raise ForbiddenError(
             "only the contract's client can approve this milestone",
             code="not_contract_client",
+        )
+
+    if contract.status != ContractStatus.ACTIVE:
+        raise ConflictError(
+            f"the contract is not active (status '{contract.status.value}')",
+            code="contract_not_active",
         )
 
     if milestone.status != MilestoneStatus.SUBMITTED:
@@ -91,9 +130,7 @@ def approve_milestone(session: Session, client: User, milestone_id: uuid.UUID) -
     session.add(milestone)
     session.flush()
 
-    # Same transaction as the status change above — release_milestone()
-    # only flushes, never commits, so if anything here fails the status
-    # change rolls back too. Money and status move together or not at all.
+    
     escrow_release_milestone(session, milestone)
 
     complete_contract_if_all_milestones_approved(session, contract)
