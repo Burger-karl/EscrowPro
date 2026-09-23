@@ -24,9 +24,10 @@ async def open_dispute(
     session: DbSession,
     user: CurrentUser,
 ) -> DisputeOut:
-    """201 on success, 403 if not a party, 404 if the milestone doesn't exist, 409 if the milestone isn't in a disputable state."""
+    """201 on success, 403 if not a party, 404 if the milestone doesn't exist, 409 if one's already open on this contract or the target isn't in a disputable state."""
     dispute = services.open_dispute(session, user, data)
     return DisputeOut.model_validate(dispute)
+
 
 @router.post(
     "/disputes/{dispute_id}/messages", response_model=MessageOut, 
@@ -41,6 +42,7 @@ async def post_message(
     """201 on success, 403 if not a party or arbiter, 404 if the dispute doesn't exist, 409 if the dispute is already resolved, 503 if firestore is unreachable."""
     return services.post_message(session, user, dispute_id, data)
 
+
 @router.post(
     "/disputes/{dispute_id}/resolve", response_model=DisputeOut 
 )
@@ -50,7 +52,8 @@ async def resolve_dispute(
     session: DbSession,
     user: CurrentUser,
 ) -> DisputeOut:
-    """200 on success, 403 if not the arbiter, 404 if the dispute doesn't exist, 422 if the split is invalid, 409 if the dispute is already resolved or escrow can't cover."""
+    """200 on success, 403 if not the arbiter, 404 if not found, 422 if the split
+    is invalid, 409 if already resolved or nothing left to settle."""
     dispute = services.resolve_dispute(session, user, dispute_id, data)
     return DisputeOut.model_validate(dispute)
 
