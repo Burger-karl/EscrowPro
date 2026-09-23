@@ -18,12 +18,18 @@ def _thread_ref(dispute_id: uuid.UUID):
 
 
 def create_thread(
-        dispute_id: uuid.UUID, milestone_id: uuid.UUID, opened_by: uuid.UUID, created_at: datetime
+    dispute_id: uuid.UUID,
+    contract_id: uuid.UUID,
+    milestone_id: uuid.UUID | None,
+    opened_by: uuid.UUID,
+    created_at: datetime,
 ) -> None:
     _thread_ref(dispute_id).set(
         {
             "dispute_id": str(dispute_id),
-            "milestone_id": str(milestone_id),
+            "contract_id": str(contract_id),
+            "milestone_id": str(milestone_id) if milestone_id else None,
+            "scope": "milestone" if milestone_id else "contract",
             "opened_by": str(opened_by),
             "status": "open",
             "created_at": created_at,
