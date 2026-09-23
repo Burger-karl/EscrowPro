@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     # Firestore
     FIRESTORE_PROJECT_ID: str = "paywork-dev"
     GOOGLE_APPLICATION_CREDENTIALS: str | None = None
+    FIRESTORE_CREDENTIALS_JSON: str | None = None
 
 
 @lru_cache
