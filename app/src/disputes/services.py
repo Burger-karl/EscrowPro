@@ -137,7 +137,7 @@ def post_message(
         id=uuid.uuid4(),
         dispute_id=dispute.id,
         author_id=user.id,
-        author_role=_author_role(user, contract),
+        author_role=author_role(user, contract),
         body=data.body,
         created_at=utcnow(),
     )
