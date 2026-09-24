@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     # Payment Webhook Signature
     WEBHOOK_SECRET: str
 
+    # paystack secret_key
+    PAYSTACK_SECRET_KEY: str = ""
+    PAYSTACK_CALLBACK_URL: str ="PAYSTACK_CALLBACK_URL=http://localhost:8000/api/v1/payments/paystack/callback"
+
     # Firestore
     FIRESTORE_PROJECT_ID: str = "paywork-dev"
     GOOGLE_APPLICATION_CREDENTIALS: str | None = None

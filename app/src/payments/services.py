@@ -1,12 +1,3 @@
-"""
-initiate_funding(), handle_webhook().
-
-initiate_funding() replaces what used to be escrow.fund_contract()'s
-job at the API boundary — it no longer moves ledger money directly.
-It asks Paystack to collect the money and returns a checkout URL.
-The ledger only moves once handle_webhook() confirms Paystack actually
-received it — see escrow.services.confirm_funding().
-"""
 import hashlib
 import hmac
 import json
@@ -17,7 +8,7 @@ from sqlmodel import Session
 
 from app.core.config import settings
 from app.core.errors import ConflictError, ForbiddenError, NotFoundError, UnauthorizedError
-from app.platform.payments.paystack_client import paystack_client
+from app.src.payments.paystack_client import paystack_client
 from app.src.accounts.models import User
 from app.src.contracts import utils as contracts_utils
 from app.src.contracts.models import ContractStatus

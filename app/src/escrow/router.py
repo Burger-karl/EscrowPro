@@ -5,7 +5,7 @@ from fastapi import APIRouter, Header, Response, status
 
 from app.core.dependencies import CurrentUser, DbSession
 from app.src.escrow import services
-from app.src.escrow.schemas import FundContractOut, StatementOut
+from app.src.escrow.schemas import StatementOut
 
 router = APIRouter(tags=["Escrow"])
 
