@@ -29,8 +29,13 @@ class Settings(BaseSettings):
     WEBHOOK_SECRET: str
 
     # paystack secret_key
-    PAYSTACK_SECRET_KEY: str = ""
+    PAYSTACK_SECRET_KEY: str = "sk_test_578e98623123672928132bb40df9ec97f9631cda"
+
     PAYSTACK_CALLBACK_URL: str ="PAYSTACK_CALLBACK_URL=http://localhost:8000/api/v1/payments/paystack/callback"
+
+
+
+
 
     # Firestore
     FIRESTORE_PROJECT_ID: str = "paywork-escrowpro"
