@@ -1,8 +1,12 @@
+"""
+get_user_by_email(), create_user(), get_user_by_id(), list_freelancers()
+— the only place accounts issues DB queries. Services call through here.
+"""
 import uuid
 
 from sqlmodel import Session, select
 
-from app.src.accounts.models import User
+from app.src.accounts.models import User, UserRole
 
 
 def get_user_by_email(session: Session, email: str) -> User | None:
@@ -19,3 +23,8 @@ def create_user(session: Session, user: User) -> User:
     session.commit()
     session.refresh(user)
     return user
+
+
+def list_freelancers(session: Session) -> list[User]:
+    statement = select(User).where(User.role == UserRole.FREELANCER, User.is_active == True)  # noqa: E712
+    return list(session.exec(statement).all())

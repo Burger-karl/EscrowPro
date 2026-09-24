@@ -1,20 +1,19 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.src.contracts.models import ContractStatus, MilestoneStatus
 
 
 class MilestoneCreateIn(BaseModel):
-    """One milestone as supplied when creating a contract."""
     title: str = Field(min_length=1, max_length=200)
     description: str = Field(min_length=1, description="What counts as this milestone being done")
     amount_minor: int = Field(gt=0, description="Amount in the smallest currency unit (e.g. kobo)")
 
 
 class ContractCreateIn(BaseModel):
-    freelancer_id: uuid.UUID
+    freelancer_email: EmailStr
     title: str = Field(min_length=1, max_length=200)
     description: str = Field(min_length=1)
     milestones: list[MilestoneCreateIn] = Field(min_length=1)
