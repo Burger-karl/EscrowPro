@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     WEBHOOK_SECRET: str
 
     # Firestore
-    FIRESTORE_PROJECT_ID: str = "paywork-dev"
+    FIRESTORE_PROJECT_ID: str = "paywork-escrowpro"
     GOOGLE_APPLICATION_CREDENTIALS: str | None = None
     FIRESTORE_CREDENTIALS_JSON: str | None = None
 

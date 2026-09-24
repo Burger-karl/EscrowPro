@@ -142,7 +142,7 @@ def split_milestone(
 
 def record_payout(session: Session, contract_id: uuid.UUID, amount_minor: int) -> None:
     amount = Decimal(amount_minor)
-    balance = utilis.get_balance(session, contract_id, LedgerAccount.FREELANCER)
+    balance = utils.get_balance(session, contract_id, LedgerAccount.FREELANCER)
     if balance < amount:
         raise ConflictError(
             "freelancer balance is too low for this payout",
