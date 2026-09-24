@@ -18,7 +18,7 @@ from app.src.disputes.schemas import (
 router = APIRouter(tags=["Disputes"])
 
 
-@router.post("/disputes", response_model=DisputeOut, status_code=status.HTTP_201_CREATED)
+@router.post("/disputes", response_model=DisputeOut, status_code=status.HTTP_201_CREATED, summary="Open Dispute (party)")
 async def open_dispute(
     data: DisputeOpenIn,
     session: DbSession,
@@ -31,7 +31,7 @@ async def open_dispute(
 
 @router.post(
     "/disputes/{dispute_id}/messages", response_model=MessageOut, 
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED, summary="Post Dispute Message (party or arbiter)"
 )
 async def post_message(
     dispute_id: uuid.UUID,
@@ -44,7 +44,7 @@ async def post_message(
 
 
 @router.post(
-    "/disputes/{dispute_id}/resolve", response_model=DisputeOut 
+    "/disputes/{dispute_id}/resolve", response_model=DisputeOut, summary="Resolve dispute (arbiter)" 
 )
 async def resolve_dispute(
     dispute_id: uuid.UUID,
@@ -58,7 +58,7 @@ async def resolve_dispute(
     return DisputeOut.model_validate(dispute)
 
 
-@router.get("/disputes/{dispute_id}/stream")
+@router.get("/disputes/{dispute_id}/stream", summary="Stream dispute (party or arbiter)")
 async def stream_dispute(
     dispute_id: uuid.UUID,
     session: DbSession,

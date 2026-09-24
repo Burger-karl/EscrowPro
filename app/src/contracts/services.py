@@ -57,6 +57,19 @@ def get_contract(session: Session, user: User, contract_id: uuid.UUID) -> Contra
     return contract
 
 
+def get_milestone(session: Session, user: User, milestone_id: uuid.UUID) -> Milestone:
+    milestone = utils.get_milestone_by_id(session, milestone_id)
+    if milestone is None:
+        raise NotFoundError("milestone not found", code="milestone_not_found")
+
+    contract = utils.get_contract_by_id(session, milestone.contract_id)
+    if contract is None:
+        raise NotFoundError("milestone not found", code="milestone_not_found")
+
+    _require_party_or_arbiter(contract, user)
+    return milestone
+
+
 def submit_milestone(session: Session, freelancer: User, milestone_id: uuid.UUID) -> Milestone:
     milestone = utils.get_milestone_by_id(session, milestone_id)
     if milestone is None:

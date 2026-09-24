@@ -7,7 +7,7 @@ from app.core.dependencies import CurrentUser, DbSession
 from app.src.payments import services
 from app.src.payments.schemas import InitiateFundingOut
 
-router = APIRouter(tags=["payments"])
+router = APIRouter(tags=["Payments"])
 
 
 @router.post(
