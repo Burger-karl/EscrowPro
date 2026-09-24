@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -16,6 +17,7 @@ from app.src.escrow.router import router as escrow_router
 from app.src.payouts.router import router as payouts_router
 from app.src.disputes.router import router as disputes_router
 from app.src.payments.router import router as payments_router
+from app.platform.tasks.scheduled import start_scheduler
 
 
 logging.basicConfig(level=settings.LOG_LEVEL)
@@ -27,7 +29,13 @@ API_PREFIX = "/api/v1"
 async def lifespan(app: FastAPI):
     # Startup: nothing yet — Firestore client, Redis pool, etc. will
     # be initialized here as those domains are built.
+    scheduler_task = start_scheduler()
     yield
+    scheduler_task.cancel()
+    try:
+        await scheduler_task
+    except asyncio.CancelledError:
+        pass
     # Shutdown: close pooled clients here.
 
 
