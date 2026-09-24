@@ -156,7 +156,7 @@ def record_payout(session: Session, contract_id: uuid.UUID, amount_minor: int) -
             account=LedgerAccount.FREELANCER,
             amount=-amount),
             LedgerEntry(contract_id=contract_id,
-            account=LedgerAccount.PAYOUT, ammount=amount),
+            account=LedgerAccount.PAYOUT, amount=amount),
         ],
     )
 
