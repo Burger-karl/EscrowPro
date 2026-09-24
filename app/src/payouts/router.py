@@ -9,7 +9,7 @@ from app.src.payouts.schemas import PayoutCreateIn, PayoutOut
 
 router = APIRouter(tags=["Payouts"])
 
-@router.post("/payouts", response_model=PayoutOut, status_code=status.HTTP_201_CREATED)
+@router.post("/payouts", response_model=PayoutOut, status_code=status.HTTP_201_CREATED, summary="Request Payout (freelancer)")
 async def request_payout(
     data: PayoutCreateIn,
     session: DbSession,
@@ -19,7 +19,7 @@ async def request_payout(
     return PayoutOut.model_validate(payout)
 
 
-@router.post("/payouts/{payout_id}/mark-sent", response_model=PayoutOut)
+@router.post("/payouts/{payout_id}/mark-sent", response_model=PayoutOut, summary="Mark Payout Sent (finance)")
 async def mark_payout_sent(
     payout_id: uuid.UUID,
     session: DbSession,
