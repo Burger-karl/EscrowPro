@@ -5,7 +5,7 @@ from app.core.rate_limit import limiter
 from app.src.accounts import services, utils
 from app.src.accounts.schemas import FreelancerOut, LoginIn, RefreshIn, RegisterIn, TokenOut
 
-router = APIRouter(tags=["auth"])
+router = APIRouter(tags=["Authentication"])
 
 
 @router.post(

@@ -26,12 +26,10 @@ UNSETTLED_MILESTONE_STATUSES = (
 
 
 def dispute_topic(dispute_id: uuid.UUID) -> str:
-    """The Broadcaster topic every stream of this dispute listens on."""
     return f"dispute:{dispute_id}"
 
 
 def author_role(user: User, contract: Contract) -> str:
-    """Return the user's role in the contract for a dispute message."""
     if user.id == contract.client_id:
         return "client"
     if user.id == contract.freelancer_id:
@@ -54,14 +52,12 @@ def _load_dispute_context(
 
 
 def get_dispute_for_viewer(session: Session, user: User, dispute_id: uuid.UUID) -> Dispute:
-    """Loads a dispute if the user is one of its parties or the arbiter (else 404 / 403)."""
     dispute, contract, _ = _load_dispute_context(session, utils.get_dispute_by_id(session, dispute_id))
     contracts_services.require_party_or_arbiter(contract, user)
     return dispute
 
 
 def open_dispute(session: Session, user: User, data: DisputeOpenIn) -> Dispute:
-    """Opens a dispute if the user is the client or the freelancer (else 403)."""
     contract = escrow_utils.get_contract_for_update(session, data.contract_id)
     if contract is None:
         raise NotFoundError("contract not found", code="contract_not_found")
