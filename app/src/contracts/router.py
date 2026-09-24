@@ -75,6 +75,18 @@ def get_contract(contract_id: uuid.UUID, session: DbSession, user: CurrentUser) 
     return ContractOut.model_validate(contract)
 
 
+@router.get(
+    "/milestones/{milestone_id}",
+    response_model=MilestoneOut,
+    summary="Get milestone (party or arbiter)",
+)
+def get_milestone(milestone_id: uuid.UUID, session: DbSession, user: CurrentUser) -> MilestoneOut:
+    """200 on success. 403 if the caller isn't a party or an arbiter, 404 if not found.
+    Handy for an arbiter looking up a disputed milestone's description and amount."""
+    milestone = services.get_milestone(session, user, milestone_id)
+    return MilestoneOut.model_validate(milestone)
+
+
 @router.post(
     "/milestones/{milestone_id}/submit",
     response_model=MilestoneOut,
