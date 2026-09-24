@@ -33,8 +33,9 @@ class Settings(BaseSettings):
     PAYSTACK_CALLBACK_URL: str ="PAYSTACK_CALLBACK_URL=http://localhost:8000/api/v1/payments/paystack/callback"
 
     # Firestore
-    FIRESTORE_PROJECT_ID: str = "paywork-dev"
+    FIRESTORE_PROJECT_ID: str = "paywork-escrowpro"
     GOOGLE_APPLICATION_CREDENTIALS: str | None = None
+    FIRESTORE_CREDENTIALS_JSON: str | None = None
 
 
 @lru_cache

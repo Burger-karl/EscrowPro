@@ -14,6 +14,7 @@ from app.src.accounts import models as accounts_models  # noqa: F401
 from app.src.contracts import models as contracts_models  # noqa: F401
 from app.src.escrow import models as escrow_models  # noqa: F401
 from app.src.payouts import models as payouts_models  # noqa: F401
+from app.src.disputes import models as disputes_models  # noqa: F401
 from app.src.payments import models as payments_models  # noqa: F401
 
 
