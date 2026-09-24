@@ -23,7 +23,7 @@ class PaymentTransaction(IDMixin, TimestampMixin, UpdatedAtMixin, table=True):
     contract_id: uuid.UUID = Field(foreign_key="contracts.id", nullable=False, index=True)
     reference: str = Field(nullable=False, unique=True, index=True)
     amount_minor: int = Field(nullable=False, gt=0)
-    status: PaymentTransactionStatus = Field(default=PaymentTransactionStatus, nullable=False)
+    status: PaymentTransactionStatus = Field(default=PaymentTransactionStatus.PENDING, nullable=False)
 
 
 class ProcessedEvent(SQLModel, table=True):
