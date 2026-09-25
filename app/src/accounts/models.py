@@ -11,6 +11,7 @@ class UserRole(StrEnum):
     FREELANCER = "freelancer"
     FINANCE = "finance"
     ARBITER = "arbiter"
+    ADMIN = "admin"
 
 
 class User(IDMixin, TimestampMixin, UpdatedAtMixin, table=True):

@@ -34,6 +34,8 @@ def author_role(user: User, contract: Contract) -> str:
         return "client"
     if user.id == contract.freelancer_id:
         return "freelancer"
+    if user.role == UserRole.ADMIN:
+        return "admin"
     return "arbiter"
 
 
@@ -159,7 +161,7 @@ def post_message(
 def resolve_dispute(
     session: Session, arbiter: User, dispute_id: uuid.UUID, data: DisputeResolveIn
 ) -> Dispute:
-    if arbiter.role != UserRole.ARBITER:
+    if arbiter.role not in (UserRole.ARBITER, UserRole.ADMIN):
         raise ForbiddenError("only the arbiter can resolve disputes", code="role_not_allowed")
 
     dispute, _, milestone = _load_dispute_context(

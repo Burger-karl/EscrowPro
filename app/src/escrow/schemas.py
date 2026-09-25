@@ -25,3 +25,14 @@ class StatementOut(BaseModel):
     entries: list[LedgerEntryOut]
     freelancer_balance: Decimal
     payout_balance: Decimal
+    total_entries: int = 0
+    limit: int = 50
+    offset: int = 0
+
+
+class FundContractOut(BaseModel):
+    contract_id: uuid.UUID
+    status: ContractStatus
+    funded_amount: Decimal
+
+    model_config = {"from_attributes": True}

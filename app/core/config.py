@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     # paystack secret_key
     PAYSTACK_SECRET_KEY: str = ""
 
-    PAYSTACK_CALLBACK_URL: str ="PAYSTACK_CALLBACK_URL=http://localhost:8000/api/v1/payments/paystack/callback"
+    PAYSTACK_CALLBACK_URL: str = "http://localhost:8000/api/v1/payments/paystack/callback"
 
 
 

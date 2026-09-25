@@ -3,10 +3,21 @@ import uuid
 
 from pydantic import BaseModel, EmailStr, Field
 
+from typing import Literal
+
 from app.src.accounts.models import UserRole
+
+PublicRole = Literal[UserRole.CLIENT, UserRole.FREELANCER]
 
 
 class RegisterIn(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+    full_name: str = Field(min_length=1, max_length=200)
+    role: PublicRole
+
+
+class AdminUserCreateIn(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
     full_name: str = Field(min_length=1, max_length=200)

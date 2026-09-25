@@ -38,9 +38,9 @@ def create_contract(session: Session, client: User, data: ContractCreateIn) -> C
     return utils.create_contract_with_milestones(session, contract, milestones)
 
 
-def _require_party_or_arbiter(contract: Contract, user: User) -> None:
+def require_party_or_arbiter(contract: Contract, user: User) -> None:
     is_party = user.id in (contract.client_id, contract.freelancer_id)
-    is_arbiter = user.role == UserRole.ARBITER
+    is_arbiter = user.role in (UserRole.ARBITER, UserRole.ADMIN)
     if not (is_party or is_arbiter):
         raise ForbiddenError(
             "you are not a party to this contract",
@@ -53,7 +53,7 @@ def get_contract(session: Session, user: User, contract_id: uuid.UUID) -> Contra
     if contract is None:
         raise NotFoundError("contract not found", code="contract_not_found")
 
-    _require_party_or_arbiter(contract, user)
+    require_party_or_arbiter(contract, user)
     return contract
 
 
@@ -66,7 +66,7 @@ def get_milestone(session: Session, user: User, milestone_id: uuid.UUID) -> Mile
     if contract is None:
         raise NotFoundError("milestone not found", code="milestone_not_found")
 
-    _require_party_or_arbiter(contract, user)
+    require_party_or_arbiter(contract, user)
     return milestone
 
 
@@ -75,11 +75,17 @@ def submit_milestone(session: Session, freelancer: User, milestone_id: uuid.UUID
     if milestone is None:
         raise NotFoundError("milestone not found", code="milestone_not_found")
 
-    contract = utils.get_contract_by_id(session, milestone.contract_id)
+    contract = utils.get_contract_for_update(session, milestone.contract_id)
     if contract is None or contract.freelancer_id != freelancer.id:
         raise ForbiddenError(
             "only the assigned freelancer can submit this milestone",
             code="not_assigned_freelancer",
+        )
+
+    if contract.status != ContractStatus.ACTIVE:
+        raise ConflictError(
+            f"contract is '{contract.status.value}', milestones cannot be submitted",
+            code="contract_not_active",
         )
 
     if milestone.status not in (MilestoneStatus.PENDING, MilestoneStatus.REJECTED):
@@ -93,15 +99,21 @@ def submit_milestone(session: Session, freelancer: User, milestone_id: uuid.UUID
 
 
 def approve_milestone(session: Session, client: User, milestone_id: uuid.UUID) -> Milestone:
-    milestone = utils.get_milestone_by_id(session, milestone_id)
+    milestone = utils.get_milestone_for_update(session, milestone_id)
     if milestone is None:
         raise NotFoundError("milestone not found", code="milestone_not_found")
 
-    contract = utils.get_contract_by_id(session, milestone.contract_id)
+    contract = utils.get_contract_for_update(session, milestone.contract_id)
     if contract is None or contract.client_id != client.id:
         raise ForbiddenError(
             "only the contract's client can approve this milestone",
             code="not_contract_client",
+        )
+
+    if contract.status != ContractStatus.ACTIVE:
+        raise ConflictError(
+            f"contract is '{contract.status.value}', milestones cannot be approved",
+            code="contract_not_active",
         )
 
     if milestone.status != MilestoneStatus.SUBMITTED:
@@ -116,15 +128,15 @@ def approve_milestone(session: Session, client: User, milestone_id: uuid.UUID) -
 
     escrow_release_milestone(session, milestone)
 
-    _complete_contract_if_all_milestones_approved(session, contract)
+    complete_contract_if_all_milestones_approved(session, contract)
 
     session.commit()
     session.refresh(milestone)
     return milestone
 
 
-def _complete_contract_if_all_milestones_approved(session: Session, contract: Contract) -> None:
+def complete_contract_if_all_milestones_approved(session: Session, contract: Contract) -> None:
     all_milestones = utils.list_milestones_for_contract(session, contract.id)
-    if all(m.status == MilestoneStatus.APPROVED for m in all_milestones):
+    if all(m.status in (MilestoneStatus.APPROVED, MilestoneStatus.RESOLVED) for m in all_milestones):
         contract.status = ContractStatus.COMPLETED
-        session.add(contract)
+        session.add(contract)

@@ -27,23 +27,24 @@ API_PREFIX = "/api/v1"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: nothing yet — Firestore client, Redis pool, etc. will
-    # be initialized here as those domains are built.
-    scheduler_task = start_scheduler()
+    import os
+    scheduler_task = None
+    if not os.environ.get("TESTING"):
+        scheduler_task = start_scheduler()
     yield
-    scheduler_task.cancel()
-    try:
-        await scheduler_task
-    except asyncio.CancelledError:
-        pass
+    if scheduler_task is not None:
+        scheduler_task.cancel()
+        try:
+            await scheduler_task
+        except asyncio.CancelledError:
+            pass
     # Shutdown: close pooled clients here.
 
 
 def create_app() -> FastAPI:
     app = FastAPI(
         title="PayWork API",
-        description="Freelance escrow backend — holds client funds until "
-        "milestone work is approved.",
+        description="Freelance escrow backend — holds client funds until milestone work is approved.",
         version="0.1.0",
         lifespan=lifespan,
     )
@@ -65,7 +66,12 @@ def create_app() -> FastAPI:
     app.include_router(payouts_router, prefix=API_PREFIX)
     app.include_router(payments_router, prefix=API_PREFIX)
 
-    @app.get("/health", tags=["meta"])
+    @app.get(
+        "/health",
+        tags=["meta"],
+        summary="[Role: Public] Service health check",
+        description="Returns service availability status. Accessible by: Public (no authentication required).",
+    )
     def health() -> dict:
         return {"status": "ok"}
 

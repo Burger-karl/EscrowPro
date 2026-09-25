@@ -7,8 +7,8 @@ from app.core.security import (
     hash_password, verify_password
 )
 from app.src.accounts import utils
-from app.src.accounts.models import User
-from app.src.accounts.schemas import LoginIn, RegisterIn, TokenOut, UserOut
+from app.src.accounts.models import User, UserRole
+from app.src.accounts.schemas import AdminUserCreateIn, LoginIn, RegisterIn, TokenOut, UserOut
 
 
 def issue_tokens(user: User) -> TokenOut:
@@ -58,3 +58,26 @@ def refresh_access_token(session: Session, refresh_token: str) -> TokenOut:
         raise UnauthorizedError("account no longer valid", code="account_disabled")
 
     return issue_tokens(user)
+
+
+def create_user_by_admin(session: Session, admin_user: User, data: AdminUserCreateIn) -> UserOut:
+    from app.core.errors import ForbiddenError
+
+    if admin_user.role != UserRole.ADMIN:
+        raise ForbiddenError("only administrators can create accounts with arbitrary roles", code="role_not_allowed")
+
+    if utils.get_user_by_email(session, data.email) is not None:
+        raise ConflictError("an account with this email already exists", code="email_taken")
+
+    user = User(
+        email=data.email,
+        password_hash=hash_password(data.password),
+        full_name=data.full_name,
+        role=data.role,
+    )
+    user = utils.create_user(session, user)
+    return UserOut.model_validate(user)
+
+
+def list_freelancers(session: Session) -> list[User]:
+    return utils.list_freelancers(session)

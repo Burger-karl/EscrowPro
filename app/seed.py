@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 SEED_PASSWORD = "Password123!"
 
 SEED_USERS: list[dict] = [
+    {"email": "admin@paywork.dev", "full_name": "Super Admin", "role": UserRole.ADMIN},
     {"email": "client1@paywork.dev", "full_name": "Ada Client", "role": UserRole.CLIENT},
     {"email": "freelancer1@paywork.dev", "full_name": "Femi Freelancer", "role": UserRole.FREELANCER},
     {"email": "arbiter1@paywork.dev", "full_name": "Bola Arbiter", "role": UserRole.ARBITER},

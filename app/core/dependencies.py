@@ -49,7 +49,7 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 def require_role(*allowed_roles: UserRole) -> Callable[[CurrentUser], User]:
     def _check(user: CurrentUser) -> User:
-        if user.role not in allowed_roles:
+        if user.role != UserRole.ADMIN and user.role not in allowed_roles:
             raise ForbiddenError(
                 f"this action requires one of: {', '.join(r.value for r in allowed_roles)}",
                 code="role_not_allowed",

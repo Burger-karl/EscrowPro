@@ -89,7 +89,7 @@ def request_payout(session: Session, freelancer: User, data: PayoutCreateIn) -> 
 
 
 def mark_payout_sent(session: Session, finance_user: User, payout_id: uuid.UUID) -> Payout:
-    if finance_user.role != UserRole.FINANCE:
+    if finance_user.role not in (UserRole.FINANCE, UserRole.ADMIN):
         raise ForbiddenError("only finance can mark payouts as sent", code="role_not_allowed")
 
     payout = utils.get_payout_for_update(session, payout_id)

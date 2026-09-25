@@ -9,6 +9,11 @@ def get_contract_by_id(session: Session, contract_id: uuid.UUID) -> Contract | N
     return session.get(Contract, contract_id)
 
 
+def get_contract_for_update(session: Session, contract_id: uuid.UUID) -> Contract | None:
+    statement = select(Contract).where(Contract.id == contract_id).with_for_update()
+    return session.exec(statement).first()
+
+
 def create_contract_with_milestones(
     session: Session,
     contract: Contract,
@@ -28,6 +33,11 @@ def create_contract_with_milestones(
 
 def get_milestone_by_id(session: Session, milestone_id: uuid.UUID) -> Milestone | None:
     return session.get(Milestone, milestone_id)
+
+
+def get_milestone_for_update(session: Session, milestone_id: uuid.UUID) -> Milestone | None:
+    statement = select(Milestone).where(Milestone.id == milestone_id).with_for_update()
+    return session.exec(statement).first()
 
 
 def list_milestones_for_contract(session: Session, contract_id: uuid.UUID) -> list[Milestone]:
